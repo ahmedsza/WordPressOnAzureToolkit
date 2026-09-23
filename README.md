@@ -7,6 +7,7 @@ This repository contains everything needed to deploy, operate, back up, and rest
 - **[Bicep/](Bicep/)** — Infrastructure as Code that provisions the full Azure environment (App Service, MySQL Flexible Server, VNet/private endpoints, Storage, Key Vault, Redis, Front Door + WAF, Communication Services email).
 - **[HelperScript/](HelperScript/)** — PowerShell operational scripts that run WP-CLI commands, back up, and restore a deployed site over an authenticated Azure tunnel (no public SSH/FTP required), plus a Redis cache setup helper.
 - **[Review/](Review/)** — PowerShell collectors that gather redacted configuration evidence from a deployed environment, plus Well-Architected checklists and a report-generation prompt for turning that evidence into findings.
+- **[Skills/](Skills/)** — GitHub Copilot skills for automating the review of WordPress on Azure App Service workloads, including the `wordpress-waf-review` skill.
 - **[waf-review-dashboard](.github/extensions/waf-review-dashboard/README.md)** — GitHub Copilot app canvas extension that visualizes the generated review as an interactive scorecard, findings dashboard, control heatmap, and remediation view.
 
 Together they cover the full lifecycle: **deploy → configure → operate → back up → restore/DR → review**.
