@@ -10,7 +10,7 @@ The fastest way to try the skill is with the sanitized collector ZIP included in
 
 
 
-### 2. Run the skill in Copilot Chat
+### 1. Run the skill in Copilot Chat
 
 Open this repository in VS Code, start GitHub Copilot Chat, and enter:
 
@@ -25,7 +25,7 @@ The skill reads the evidence, assesses all 157 checklist controls, and writes th
 
 The output directory contains `executive-summary.md`, `detailed-well-architected-review.md`, `findings.csv`, and `well-architected-review.pptx`. 
 
-### 3. Open the interactive dashboard (only applies to GitHub Copilot App)
+### 2. Open the interactive dashboard (only applies to GitHub Copilot App)
 
 After report generation, ask Copilot Chat:
 
@@ -35,7 +35,7 @@ Open the WAF review dashboard for the output directory containing the generated 
 
 The `waf-review-dashboard` canvas visualizes the scorecard, pillars, findings, controls, remediation plan, and collection gaps in the GitHub Copilot app.
 
-### 4. Sample
+### Sample
 Check out the sample directory in [Samples/OutputReport](Samples/OutputReport/) to see the expected output structure and content.
 
 ## When to use it
