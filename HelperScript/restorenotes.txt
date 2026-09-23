@@ -1,0 +1,32 @@
+$RG_DR = "<resource-group-name>"
+$APP_NAME_DR = '<APPSERVICENAME>'
+$AFD_PROFILE_NAME = '<FRONTDOORPROFILENAME>'
+$AFD_ENDPOINT_NAME = '<AFDENDPOINTNAME>'
+$AFD_CONTENT_PATHS = '/*'
+$AFD_DOMAIN_NAME = 'AFDDOMAINNAME'
+$RedisName = 'REDISNAME'
+$BackupPath='.\wp-backups\....'
+
+
+
+# Restore Azure WordPress backup and configure Redis, then purge Front Door cache
+
+./Restore-AzureWordpressBackup.ps1 -ResourceGroup $RG_DR -AppName $APP_NAME_DR `
+    -BackupPath $BackupPath `
+    -FrontDoorProfileName $AFD_PROFILE_NAME -FrontDoorEndpointName $AFD_ENDPOINT_NAME
+
+./setupredis.ps1 -ResourceGroup $RG_DR -AppName $APP_NAME_DR -RedisName $RedisName
+
+
+az afd endpoint purge --resource-group $RG_DR `
+--profile-name $AFD_PROFILE_NAME `
+--endpoint-name $AFD_ENDPOINT_NAME `
+--domains $AFD_DOMAIN_NAME `
+--content-paths $AFD_CONTENT_PATHS
+
+Write-Host "all done"
+
+
+# run this in ssh console if you need to reset password. Assumes user is wpadmin
+
+wp  user update wpadmin --user_pass="<PASSWORD>"  --path=/home/site/wwwroot --allow-root

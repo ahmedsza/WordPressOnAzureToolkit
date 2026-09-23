@@ -1,0 +1,5 @@
+# Deployment parameter files may contain environment configuration and secrets.
+*.parameters.json
+
+# Local planning notes.
+/plan*.md
