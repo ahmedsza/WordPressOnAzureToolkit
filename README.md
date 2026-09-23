@@ -226,9 +226,9 @@ See [SKILLSREADME.md](SKILLSREADME.md) for prerequisites, invocation guidance, d
 
 See [Review/README.md](Review/README.md) for full usage, prerequisites, and output details.
 
-## Are the subfolder READMEs useful?
+## Subfolder READMEs useful?
 
-Yes — keep using them as the detailed reference for each area:
+
 
 - **[Bicep/README.md](Bicep/README.md)** is an accurate, up-to-date usage guide for the current template (environment profiles, required parameters, validate/deploy steps, Front Door/private-media caveats). Use it as the primary deployment reference.
 - **[Bicep/wordpressbicep.md](Bicep/wordpressbicep.md)** is a deep architecture/security review with a full parameter and resource reference — most useful before making infrastructure changes or hardening decisions. Note it describes some findings against an earlier version of the template (e.g. public storage/shared-key defaults); cross-check current parameter defaults in the `.sample.json` files, which already show private endpoints, Key Vault, and Redis as part of the current design.
