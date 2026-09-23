@@ -16,7 +16,7 @@ Coverage % = Decided / (Total − N/A) × 100 // how much of the applicable chec
 
 Round both to a whole number. If `Decided` is 0, record the score as `n/a` and coverage as `0%`.
 
-Never state a score without its coverage figure alongside it — in the summary, the detailed report, or in conversation with the user.
+Never state a score without its coverage figure alongside it — in the summary, the detailed report, on a slide, or in conversation with the user.
 
 ## RAG banding
 

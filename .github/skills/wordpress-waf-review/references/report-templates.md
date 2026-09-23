@@ -1,6 +1,8 @@
 # Report templates
 
-Fixed structures for the three output files. Keep heading order, table columns, and the CSV header row exactly as written so reports are comparable across runs and environments.
+Fixed structures for the two Markdown reports and the CSV. Keep heading order, table columns, and the CSV header row exactly as written so reports are comparable across runs and environments.
+
+The fourth output, `well-architected-review.pptx`, is specified in [presentation-template.md](./presentation-template.md).
 
 Replace every `<...>` placeholder. Never ship a placeholder or a "TBD" row.
 

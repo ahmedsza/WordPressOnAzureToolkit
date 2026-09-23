@@ -1,6 +1,6 @@
 # WordPress Well-Architected Review Skill
 
-This repository includes the `wordpress-waf-review` skill for GitHub Copilot. It converts the redacted JSON evidence produced by `Invoke-CollectWordPressPosture.ps1` into a scored Azure Well-Architected Framework review for WordPress on Azure App Service.
+This repository includes the `wordpress-waf-review` skill for GitHub Copilot. It converts the redacted JSON evidence produced by `Invoke-CollectWordPressPosture.ps1` into a scored Azure Well-Architected Framework review and PowerPoint presentation for WordPress on Azure App Service.
 
 The skill definition is in [.github/skills/wordpress-waf-review/SKILL.md](.github/skills/wordpress-waf-review/SKILL.md).
 
@@ -10,7 +10,7 @@ Use the skill to:
 
 - Review a WordPress on Azure App Service workload.
 - Score collected evidence against the repository's WordPress checklist.
-- Generate an executive summary, a complete control-by-control assessment, and an importable findings backlog.
+- Generate an executive summary, a complete control-by-control assessment, an importable findings backlog, and a PowerPoint review deck.
 
 Do not use it to deploy or modify Azure resources, manage WordPress content, author Bicep, or review non-WordPress workloads.
 
@@ -33,6 +33,8 @@ Collecting fresh evidence requires:
 - At least Azure `Reader`; `Monitoring Reader` and `Security Reader` improve coverage.
 - The Azure resource group and subscription ID confirmed before collection.
 
+PowerPoint generation requires Node.js and `pptxgenjs`. The skill follows the bundled PowerPoint tooling and QA workflow; if the deck tooling cannot be installed, it reports that limitation and still delivers the three written report files rather than a partial deck.
+
 The collector is read-only and redacts secret values.
 
 ## How to invoke the skill
@@ -43,7 +45,7 @@ Open this repository in VS Code and ask GitHub Copilot Chat to run a WordPress W
 
 ```text
 Run the wordpress-waf-review skill using evidence in Evidence/<collection-folder>.
-Write the reports to Review/reports/<report-name>.
+Write the reports and PowerPoint deck to the default output directory.
 This is a production environment with an RTO of 4 hours and an RPO of 1 hour.
 ```
 
@@ -51,14 +53,14 @@ This is a production environment with an RTO of 4 hours and an RPO of 1 hour.
 
 ```text
 Assess the WordPress Azure posture for resource group <resource-group> in subscription <subscription-id>.
-Collect evidence first, then write the WAF reports to Review/reports/<report-name>.
+Collect evidence first, then write the WAF reports and PowerPoint deck.
 ```
 
 ### Review a collector ZIP file
 
 ```text
 Generate the WordPress Well-Architected review from Evidence/<collector-output>.zip.
-Expand it and write the reports to Review/reports/<report-name>.
+Expand it and write the reports and PowerPoint deck.
 ```
 
 Include any known workload context in the prompt, especially:
@@ -76,21 +78,22 @@ Unknown context does not block the review; the reports record it as unknown rath
 | Input | Requirement or default |
 |---|---|
 | Evidence | Directory containing `collection-manifest.json`, or a collector ZIP file. If omitted, provide a resource group and subscription for collection. |
-| Checklist | Defaults to [Review/reviewdocs/AzureWordPressChecklist.md](Review/reviewdocs/AzureWordPressChecklist.md). |
-| Output directory | Defaults to `Review/reports/<resource-group>-<yyyyMMdd>/`. |
+| Checklist | Defaults to the skill's bundled [AzureWordPressChecklist.md](.github/skills/wordpress-waf-review/references/AzureWordPressChecklist.md). |
+| Output directory | Defaults to `Review/reports/<evidence-folder-name>-reports/`; reruns overwrite that folder rather than creating a numbered variant. |
 | Workload context | Optional, but improves assessment quality and prioritization. |
 
 ## Outputs
 
-The skill always creates these three files in the selected output directory:
+The skill creates these four files in the selected output directory unless the user declines slides or PowerPoint tooling is unavailable. `well-architected-review.pptx` is the fourth output:
 
 | File | Purpose |
 |---|---|
 | `executive-summary.md` | Leadership scorecard, evidence coverage, strengths, top risks, and prioritized remediation. |
 | `detailed-well-architected-review.md` | Assessment of all 157 checklist controls with status, evidence pointers, and recommendations. |
 | `findings.csv` | One row for every failure or material evidence gap, scored for severity, effort, risk, and cost. |
+| `well-architected-review.pptx` | Executive readout with overview, pillar, controls, findings, remediation, manual-validation, and collection-gap slides. |
 
-The final Copilot response also reports the output paths, overall score and evidence coverage, critical and high finding counts, and the three most important collection gaps.
+The deck is generated last from the verified Markdown and CSV reports; it presents the assessment and never re-scores the evidence. The final Copilot response reports all output paths, overall score and evidence coverage, critical and high finding counts, and the three most important collection gaps.
 
 ## Assessment behavior
 
@@ -101,5 +104,6 @@ Scores are always presented with evidence coverage. The reports never reproduce 
 ## Related documentation
 
 - [Review/README.md](Review/README.md) explains evidence collection and collector output.
-- [Review/reviewdocs/AzureWordPressChecklist.md](Review/reviewdocs/AzureWordPressChecklist.md) is the assessment checklist.
+- [.github/skills/wordpress-waf-review/references/AzureWordPressChecklist.md](.github/skills/wordpress-waf-review/references/AzureWordPressChecklist.md) is the bundled assessment checklist.
+- [.github/skills/wordpress-waf-review/references/presentation-template.md](.github/skills/wordpress-waf-review/references/presentation-template.md) defines the deck structure and QA requirements.
 - [Review/genreport.md](Review/genreport.md) contains the original report-generation prompt reference.

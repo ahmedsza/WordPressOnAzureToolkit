@@ -1,13 +1,14 @@
 # Azure WordPress Toolkit
 
-> **GitHub Copilot skill and app canvas included:** This repository provides the `wordpress-waf-review` skill for generating an evidence-based Azure Well-Architected review and the `waf-review-dashboard` GitHub Copilot app canvas extension for visualizing the generated report. Ask Copilot Chat to **"Run the WordPress WAF review using evidence in `Evidence/<collection-folder>` and open the report dashboard"**. See [SKILLSREADME.md](SKILLSREADME.md) for skill usage and the [dashboard README](.github/extensions/waf-review-dashboard/README.md) for canvas details.
+> **GitHub Copilot skill and app canvas included:** This repository provides the `wordpress-waf-review` skill for generating an evidence-based Azure Well-Architected review, including a PowerPoint readout, and the `waf-review-dashboard` GitHub Copilot app canvas extension for visualizing the generated report. Ask Copilot Chat to **"Run the WordPress WAF review using evidence in `Evidence/<collection-folder>`, build the PowerPoint deck, and open the report dashboard"**. See [SKILLSREADME.md](SKILLSREADME.md) for skill usage and the [dashboard README](.github/extensions/waf-review-dashboard/README.md) for canvas details.
 
 This repository contains everything needed to deploy, operate, back up, and restore a containerized WordPress site on Azure:
 
 - **[Bicep/](Bicep/)** — Infrastructure as Code that provisions the full Azure environment (App Service, MySQL Flexible Server, VNet/private endpoints, Storage, Key Vault, Redis, Front Door + WAF, Communication Services email).
 - **[HelperScript/](HelperScript/)** — PowerShell operational scripts that run WP-CLI commands, back up, and restore a deployed site over an authenticated Azure tunnel (no public SSH/FTP required), plus a Redis cache setup helper.
 - **[Review/](Review/)** — PowerShell collectors that gather redacted configuration evidence from a deployed environment, plus Well-Architected checklists and a report-generation prompt for turning that evidence into findings.
-- **[Skills/](Skills/)** — GitHub Copilot skills for automating the review of WordPress on Azure App Service workloads, including the `wordpress-waf-review` skill.
+- **[Samples/](Samples/README.md)** — Example collector ZIP and generated `OutputReport`. Extract the ZIP, point the skill at the extracted evidence folder, and compare the result with the included report.
+- **[wordpress-waf-review skill](.github/skills/wordpress-waf-review/SKILL.md)** — GitHub Copilot skill that scores the workload and creates Markdown, CSV, and PowerPoint deliverables.
 - **[waf-review-dashboard](.github/extensions/waf-review-dashboard/README.md)** — GitHub Copilot app canvas extension that visualizes the generated review as an interactive scorecard, findings dashboard, control heatmap, and remediation view.
 
 Together they cover the full lifecycle: **deploy → configure → operate → back up → restore/DR → review**.
@@ -18,9 +19,11 @@ A review starts with a deployed WordPress environment in Azure. You can create t
 
 1. **Prepare the environment and reviewer workstation.** Deploy WordPress and its Azure resources by following [Bicep/README.md](Bicep/README.md), or use an independently provisioned WordPress on Azure App Service environment. Install PowerShell 7 and Azure CLI, run `az login`, select the correct subscription, and ensure the signed-in identity has at least `Reader` access. `Monitoring Reader` and `Security Reader` improve evidence coverage.
 2. **Collect evidence.** Run `Review/PSScripts/Invoke-CollectWordPressPosture.ps1` against the deployed resource group. The read-only collector inventories the environment and writes redacted JSON evidence, including `collection-manifest.json`, to the chosen output directory.
-3. **Generate the review.** Ask GitHub Copilot to run the `wordpress-waf-review` skill against the evidence directory. The skill assesses the evidence against [Review/reviewdocs/AzureWordPressChecklist.md](Review/reviewdocs/AzureWordPressChecklist.md) and produces the executive summary, detailed review, and findings CSV.
-4. **Visualize the report.** Open the included `waf-review-dashboard` canvas in the GitHub Copilot app. It reads the three report files and displays the score, coverage, pillars, findings, all 157 controls, remediation plan, and collection gaps interactively. The canvas does not call Azure, modify the reports, or recalculate scores.
+3. **Generate the review and presentation.** Ask GitHub Copilot to run the `wordpress-waf-review` skill against the evidence directory. The skill assesses the evidence against its bundled [AzureWordPressChecklist.md](.github/skills/wordpress-waf-review/references/AzureWordPressChecklist.md) and writes four outputs to `Review/reports/<evidence-folder-name>-reports/`: an executive summary, detailed review, findings CSV, and `well-architected-review.pptx` as the fourth output. The deck is built last from the verified reports and does not perform a second assessment.
+4. **Visualize the report.** Open the included `waf-review-dashboard` canvas in the GitHub Copilot app. It reads the three source report files (the two Markdown files and CSV) and displays the score, coverage, pillars, findings, all 157 controls, remediation plan, and collection gaps interactively. The canvas does not read the PPTX, call Azure, modify the reports, or recalculate scores.
 5. **Review and act on findings.** Confirm evidence gaps and manually verified controls, prioritize the findings, and use the recommendations to plan remediation. Resource changes are not performed by the collector, review skill, or dashboard.
+
+To try steps 3 and 4 without deploying an environment or connecting to Azure, use the collector ZIP in [Samples/](Samples/README.md). Extract it first, then point the skill at the extracted folder containing `collection-manifest.json`. The generated report will be similar to the included `Samples/OutputReport/` example.
 
 ```mermaid
 flowchart TD
@@ -35,11 +38,13 @@ flowchart TD
   H --> I[executive-summary.md]
   H --> J[detailed-well-architected-review.md]
   H --> K[findings.csv]
+  H --> O[well-architected-review.pptx]
   I --> L[Open waf-review-dashboard in the GitHub Copilot app]
   J --> L
   K --> L
   L --> M[Explore scores, findings, controls, and gaps]
   M --> N[Validate, prioritize, and remediate]
+  O --> N
 ```
 
 ## Repository layout
@@ -66,6 +71,10 @@ Review/
   reviewdocs/AzureWordPressChecklist.md                # Canonical Well-Architected review checklist for this workload
   genreport.md                                         # Prompt reference for generating review reports from collected evidence
   README.md                                            # Evidence-collection and review workflow guide (see below)
+Samples/
+  wordpress-posture-*.zip                              # Example ZIP produced by the PowerShell collector
+  OutputReport/                                        # Example four-file report generated by the skill
+  README.md                                            # Extraction and sample review walkthrough
 .github/skills/wordpress-waf-review/                   # Copilot skill that generates the scored WAF review
 .github/extensions/waf-review-dashboard/               # Copilot app canvas that visualizes generated reports
 SKILLSREADME.md                                        # Skill installation, invocation, inputs, and outputs
@@ -77,6 +86,7 @@ SKILLSREADME.md                                        # Skill installation, inv
 - **PowerShell 7+** for every script in this repo.
 - For `Bicep/`: the Az Bicep CLI integration (`az bicep install` / `az bicep upgrade`).
 - For `HelperScript/`: the `Posh-SSH` PowerShell module (`Install-Module Posh-SSH -Scope CurrentUser`).
+- For the PowerPoint output: Node.js and `pptxgenjs`; the skill reports the missing prerequisite and still delivers the three written reports if deck tooling cannot be installed.
 
 ## 1. Deploy the infrastructure (`Bicep/`)
 
@@ -185,7 +195,7 @@ cd Review
 ./PSScripts/Invoke-CollectWordPressPosture.ps1 -ResourceGroup <resource-group-name> -OutputDirectory <output-directory>
 ```
 
-Use [Review/reviewdocs/AzureWordPressChecklist.md](Review/reviewdocs/AzureWordPressChecklist.md), the canonical Well-Architected checklist for this workload, alongside the collected evidence to score the environment. [Review/genreport.md](Review/genreport.md) documents the prompt used to turn the checklist and evidence into a high-level summary, a detailed Well-Architected review, and a findings CSV.
+The skill uses its bundled [AzureWordPressChecklist.md](.github/skills/wordpress-waf-review/references/AzureWordPressChecklist.md) to score the environment. [Review/reviewdocs/AzureWordPressChecklist.md](Review/reviewdocs/AzureWordPressChecklist.md) remains the collector-area copy, and [Review/genreport.md](Review/genreport.md) documents the original report-generation prompt.
 
 ### Run the review skill
 
@@ -195,7 +205,7 @@ Using existing evidence:
 
 ```text
 Run the wordpress-waf-review skill using evidence in Evidence/<collection-folder>.
-Write the reports to Review/reports/<report-name>.
+Write all reports and the PowerPoint deck to the default output directory.
 This is a production environment with an RTO of 4 hours and an RPO of 1 hour.
 ```
 
@@ -203,14 +213,37 @@ Collecting evidence first:
 
 ```text
 Run a WAF review for WordPress resource group <resource-group> in subscription <subscription-id>.
-Collect the evidence first and write the reports to Review/reports/<report-name>.
+Collect the evidence first, then write the reports and PowerPoint deck.
 ```
 
-The skill generates all three of these files:
+The skill generates all four of these files:
 
 - `executive-summary.md` — scorecard, strengths, top risks, and prioritized remediation.
 - `detailed-well-architected-review.md` — evidence-backed assessment of every applicable checklist control.
 - `findings.csv` — failed and materially unverified controls for backlog import.
+- `well-architected-review.pptx` — overview, pillar, controls, findings, remediation, and collection-gap slides for review readouts.
+
+### Try the included sample
+
+The [Samples folder](Samples/README.md) contains a ZIP produced by `Invoke-CollectWordPressPosture.ps1` and an `OutputReport` example. The ZIP must be extracted before use because the skill is pointed at the extracted directory containing `collection-manifest.json`, not at the archive itself.
+
+From the repository root:
+
+```powershell
+Expand-Archive `
+  -LiteralPath ".\Samples\wordpress-posture-20260909-105411-20260909T090305751Z-5f227fba.zip" `
+  -DestinationPath ".\Samples\Extracted" `
+  -Force
+```
+
+Then ask Copilot Chat:
+
+```text
+Run the wordpress-waf-review skill using evidence in Samples/Extracted/wordpress-posture-20260909-105411.
+Write all reports and the PowerPoint deck to the default output directory.
+```
+
+The default result is `Review/reports/wordpress-posture-20260909-105411-reports/`, with the same four deliverable types shown in `Samples/OutputReport/`. See [Samples/README.md](Samples/README.md) for the complete walkthrough.
 
 ### Visualize the report in the GitHub Copilot app
 
@@ -234,6 +267,7 @@ See [Review/README.md](Review/README.md) for full usage, prerequisites, and outp
 - **[Bicep/wordpressbicep.md](Bicep/wordpressbicep.md)** is a deep architecture/security review with a full parameter and resource reference — most useful before making infrastructure changes or hardening decisions. Note it describes some findings against an earlier version of the template (e.g. public storage/shared-key defaults); cross-check current parameter defaults in the `.sample.json` files, which already show private endpoints, Key Vault, and Redis as part of the current design.
 - **[HelperScript/README.md](HelperScript/README.md)** is a detailed, accurate guide to the backup workflow, including the important SCM access-restriction behavior, and now also cross-references `Restore-AzureWordpressBackup.ps1`, `RestoreFromLocal.ps1`, and `SetupRedis.ps1` under its "Related Scripts" section.
 - **[Review/README.md](Review/README.md)** is the usage guide for the evidence collector and the review workflow that consumes it.
+- **[Samples/README.md](Samples/README.md)** explains how to extract the included collector ZIP, run the skill against it, and compare the generated files with `Samples/OutputReport/`.
 
 ## Security notes
 

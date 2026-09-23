@@ -8,7 +8,7 @@ Whatever the skill wrote is what the dashboard shows.
 
 ## Input
 
-Point it at a directory containing the skill's three output files:
+The skill normally creates four outputs. The fourth output, `well-architected-review.pptx`, is not a canvas input and is not parsed by the canvas. The canvas consumes only these three source report files:
 
 | File | Used for |
 |---|---|
