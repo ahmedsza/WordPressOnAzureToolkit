@@ -4,6 +4,39 @@ This repository includes the `wordpress-waf-review` skill for GitHub Copilot. It
 
 The skill definition is in [.github/skills/wordpress-waf-review/SKILL.md](.github/skills/wordpress-waf-review/SKILL.md).
 
+## Quickstart
+
+The fastest way to try the skill is with the sanitized collector ZIP included in this repository. This assumes the user has already extracted the data from the powershell ZIP to a directory
+
+
+
+### 2. Run the skill in Copilot Chat
+
+Open this repository in VS Code, start GitHub Copilot Chat, and enter:
+
+```text
+Run the wordpress-waf-review skill using evidence in <DIRECTORY WHERE THE EXTRACTED EVIDENCE IS LOCATED>
+Write all reports and the PowerPoint deck to the default output directory.
+```
+
+The skill reads the evidence, assesses all 157 checklist controls, and writes the result to an output directory
+
+
+
+The output directory contains `executive-summary.md`, `detailed-well-architected-review.md`, `findings.csv`, and `well-architected-review.pptx`. 
+
+### 3. Open the interactive dashboard (only applies to GitHub Copilot App)
+
+After report generation, ask Copilot Chat:
+
+```text
+Open the WAF review dashboard for the output directory containing the generated reports.
+```
+
+The `waf-review-dashboard` canvas visualizes the scorecard, pillars, findings, controls, remediation plan, and collection gaps in the GitHub Copilot app.
+
+
+
 ## When to use it
 
 Use the skill to:
