@@ -35,7 +35,8 @@ Open the WAF review dashboard for the output directory containing the generated 
 
 The `waf-review-dashboard` canvas visualizes the scorecard, pillars, findings, controls, remediation plan, and collection gaps in the GitHub Copilot app.
 
-
+### 4. Sample
+Check out the sample directory in [Samples/OutputReport](Samples/OutputReport/) to see the expected output structure and content.
 
 ## When to use it
 
